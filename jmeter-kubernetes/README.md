@@ -10,9 +10,7 @@ Minikube
 minikube start --cpus=4 --memory=4g
 minikube kubectl config view > ~/.kube/config
 
-export DOCKER_TLS_VERIFY=1;
-export DOCKER_HOST=tcp://$(docker container port minikube 2376);
-export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
+export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
 ```
 
 ## Execution
@@ -21,6 +19,11 @@ export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
 ./dockerimages.sh
 ./jmeter_cluster_create.sh
 ./dashboard.sh
+kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000 &
+```
+http://localhost:3000/ should answer
+Import Dashboard: GrafanaJMeterTemplate.json
+```
 ./start_test.sh
 ```
 
