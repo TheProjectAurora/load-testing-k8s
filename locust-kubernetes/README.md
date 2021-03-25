@@ -35,3 +35,7 @@ locustfile.py  results_2021_03_23_11_46_48.csv  tasks.py
 shoisko@DuuniWin10:~/tmp$ kubectl cp sakenomalocust-master-85f87fbf66-q4bzk:results_2021_03_23_11_46_48.csv results_jmet
 er.csv
 ``` 
+
+# Source of idea:
+https://github.com/joakimhew/locust-kubernetes
+https://github.com/hansehe/locust/
