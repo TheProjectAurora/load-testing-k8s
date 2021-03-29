@@ -40,19 +40,26 @@ With ```kubectl --namespace default edit deployment nginx``` add toleration in p
 ```
 Then nginx should be in running state: ```kubectl --namespace default get pods```
 
-## Jmeter Execution
+## Jmeter environment startup:
 Note. Without perf=true:NoSchedule node taint jmeter could not be started
 Start jmeter tools:
 ```bash
-./dockerimages.sh
-./jmeter_cluster_create.sh
-./dashboard.sh
+./build_docker_images.sh
+./cluster_create.sh
+./dashboard_init.sh
 kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000 &
 ```
 http://localhost:3000/ should answer
 Import Dashboard: GrafanaJMeterTemplate.json
 ```
 ./start_test.sh testi.jmx nginx.default outfile.csv
+```
+
+## Delete all:
+```bash
+kubectl --namespace default delete deployment nginx
+kubectl --namespace default delete service nginx
+kubecl delete namespace <same_that_you_give_to_cluster_create.sh>
 ```
 
 # Based to
