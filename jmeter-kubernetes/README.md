@@ -18,7 +18,7 @@ export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 23
 Taint the nodes where you wanna jmeter to under execution:
 ```bash
 kubectl get nodes
-kubectl taint nodes <NODE_NAME> perf=true:NoSchedule
+kubectl taint node <NODE_NAME> perf=true:NoSchedule
 ```
 ## Start SUT (just nginx)
 ```

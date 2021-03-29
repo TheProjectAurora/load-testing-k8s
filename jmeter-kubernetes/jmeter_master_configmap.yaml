@@ -10,6 +10,7 @@ data:
     #Script created to invoke jmeter test script with the slave POD IP addresses
     #Script should be run like: ./load_test "path to the test script in jmx format"
     set -ex
+    rm -Rfv /tmp/*
     /jmeter/apache-jmeter-*/bin/jmeter $@ -R `getent ahostsv4 jmeter-slaves-svc | cut -d' ' -f1 | sort -u | awk -v ORS=, '{print $1}' | sed 's/,$//'`
   full-logs.properties: |
     #---------------------------------------------------------------------------
