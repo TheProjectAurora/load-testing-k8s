@@ -15,6 +15,12 @@ export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 23
 
 ## Execution
 
+Taint the nodes where you wanna jmeter to under execution:
+```bash
+kubectl get nodes
+kubectl taint nodes <NODE_NAME> perf=true:NoSchedule
+```
+Start jmeter tools:
 ```bash
 ./dockerimages.sh
 ./jmeter_cluster_create.sh

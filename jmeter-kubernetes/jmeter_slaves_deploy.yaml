@@ -21,3 +21,7 @@ spec:
         ports:
         - containerPort: 1099
         - containerPort: 50000
+      tolerations:
+      - key: "perf"
+        operator: "Exists"
+        effect: "NoSchedule"
