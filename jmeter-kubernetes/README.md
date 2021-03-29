@@ -5,7 +5,7 @@ Kubernetes > 1.16
 Docker
 Minikube
 
-# SandBox - Start minikube and connect kubectl and docker to it:
+## SandBox - Start minikube and connect kubectl and docker to it:
 ```
 minikube start --cpus=4 --memory=4g
 minikube kubectl config view > ~/.kube/config
@@ -13,13 +13,35 @@ minikube kubectl config view > ~/.kube/config
 export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
 ```
 
-## Execution
-
+## Taint nodes where jmeter should be executed
+### FYI: Taints with multible nodes could be tested with https://kind.sigs.k8s.io/
 Taint the nodes where you wanna jmeter to under execution:
 ```bash
 kubectl get nodes
 kubectl taint nodes <NODE_NAME> perf=true:NoSchedule
 ```
+## Start SUT (just nginx)
+```
+kubectl --namespace default create deployment nginx --image=nginx
+kubectl --namespace default create service nodeport nginx --tcp=80:80
+kubectl --namespace default get pods
+```
+nginx pod should be in Pending state.
+
+With ```kubectl --namespace default edit deployment nginx``` add toleration in place:
+```
+---clip---
+  tolerations:
+  - effect: NoSchedule
+    key: perf
+    operator: Exists
+---clap---
+
+```
+Then nginx should be in running state: ```kubectl --namespace default get pods```
+
+## Jmeter Execution
+Note. Without perf=true:NoSchedule node taint jmeter could not be started
 Start jmeter tools:
 ```bash
 ./dockerimages.sh
@@ -30,7 +52,7 @@ kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000 &
 http://localhost:3000/ should answer
 Import Dashboard: GrafanaJMeterTemplate.json
 ```
-./start_test.sh
+./start_test_with_hostname.sh testi.jmx nginx.default outfile.csv
 ```
 
 # Based to
