@@ -11,6 +11,9 @@ tenant=`awk '{print $NF}' "$working_dir/tenant_export"`
 jmx="$1"
 [ -n "$jmx" ] || read -p 'Enter path to the jmx file ' jmx
 
+host="$2"
+[ -n "$host" ] || read -p 'Give hostname ' host
+
 if [ ! -f "$jmx" ];
 then
     echo "Test script file was not found in PATH"
@@ -28,4 +31,4 @@ kubectl cp "$jmx" -n $tenant "$master_pod:/$test_name"
 
 ## Echo Starting Jmeter load test
 
-kubectl exec -ti -n $tenant $master_pod -- /bin/bash /load_test "$test_name -JBASE_URL=www.test.com"
+kubectl exec -ti -n $tenant $master_pod -- /bin/bash /load_test "$test_name -JBASE_URL=$host"
