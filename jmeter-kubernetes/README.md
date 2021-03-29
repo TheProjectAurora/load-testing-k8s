@@ -26,7 +26,7 @@ kubectl --namespace default create deployment nginx --image=nginx
 kubectl --namespace default create service nodeport nginx --tcp=80:80
 kubectl --namespace default get pods
 ```
-nginx pod should be in Pending state.
+If nginx pod is in Pending state then:
 
 With ```kubectl --namespace default edit deployment nginx``` add toleration in place:
 ```
@@ -52,7 +52,7 @@ kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000 &
 http://localhost:3000/ should answer
 Import Dashboard: GrafanaJMeterTemplate.json
 ```
-./start_test_with_hostname.sh testi.jmx nginx.default outfile.csv
+./start_test.sh testi.jmx nginx.default outfile.csv
 ```
 
 # Based to
