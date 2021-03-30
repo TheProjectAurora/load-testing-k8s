@@ -62,6 +62,7 @@ Import Dashboard: GrafanaJMeterTemplate.json
 kubectl --namespace default delete deployment nginx
 kubectl --namespace default delete service nginx
 kubecl delete namespace <same_that_you_give_to_cluster_create.sh>
+unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH
 ```
 
 # Based to
