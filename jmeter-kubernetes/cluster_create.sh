@@ -84,9 +84,9 @@ echo "Creating Influxdb and the service"
 
 kubectl create -n $tenant -f $working_dir/jmeter_influxdb_configmap.yaml
 
-kubectl create -n $tenant -f $working_dir/jmeter_influxdb_deploy.yaml
-
 kubectl create -n $tenant -f $working_dir/jmeter_influxdb_svc.yaml
+
+kubectl create -n $tenant -f $working_dir/jmeter_influxdb_statefull.yaml
 
 echo "Creating Grafana Deployment"
 

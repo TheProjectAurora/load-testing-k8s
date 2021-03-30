@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: influxdb-jmeter
   labels:
@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       app: influxdb-jmeter
+  serviceName: jmeter-influxdb
   template:
     metadata:
       labels:
@@ -21,6 +22,8 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /etc/influxdb
+          - name: influxdb-jmeter-storage-stagging
+            mountPath: /var/lib/influxdb
           ports:
             - containerPort: 8083
               name: influx
@@ -36,3 +39,18 @@ spec:
       - key: "perf"
         operator: "Exists"
         effect: "NoSchedule"
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      name: influxdb-jmeter-storage-stagging
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      volumeMode: Filesystem
+    status:
+      phase: Pending

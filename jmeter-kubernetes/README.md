@@ -7,7 +7,7 @@ Minikube
 
 ## SandBox - Start minikube and connect kubectl and docker to it:
 ```
-minikube start --cpus=4 --memory=4g
+ku
 minikube kubectl config view > ~/.kube/config
 
 export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
@@ -30,6 +30,8 @@ If nginx pod is in Pending state then:
 
 With ```kubectl --namespace default edit deployment nginx``` add toleration in place:
 ```
+---clip here you see that tolerations chould be in same level than containers---
+  containers:
 ---clip---
   tolerations:
   - effect: NoSchedule
@@ -52,7 +54,7 @@ kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000 &
 http://localhost:3000/ should answer
 Import Dashboard: GrafanaJMeterTemplate.json
 ```
-./start_test.sh testi.jmx nginx.default outfile.csv
+./start_test.sh test_nginx.jmx nginx.default jmeter_results.csv
 ```
 
 ## Delete all:
