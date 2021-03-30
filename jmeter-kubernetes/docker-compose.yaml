@@ -1,7 +1,7 @@
 version: '2'
 services:
 
-  novnc-with-modeler:
+  novnc-jmeter:
     build:
       context: ./infra/novnc-jmeter
       dockerfile: Dockerfile
