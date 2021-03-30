@@ -7,7 +7,7 @@ Minikube
 
 ## SandBox - Start minikube and connect kubectl and docker to it:
 ```
-ku
+minikube start --cpus=4 --memory=4g
 minikube kubectl config view > ~/.kube/config
 
 export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
@@ -46,7 +46,7 @@ Then nginx should be in running state: ```kubectl --namespace default get pods``
 Note. Without perf=true:NoSchedule node taint jmeter could not be started
 Start jmeter tools:
 ```bash
-./build_docker_images.sh
+  ./build_docker_images.sh
 ./cluster_create.sh
 ./dashboard_init.sh
 kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000 &
