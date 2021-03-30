@@ -36,7 +36,7 @@ kubectl cp "$jmx" -n $tenant "$master_pod:/$test_name"
 
 ## Echo Starting Jmeter load test
 
-kubectl exec -ti -n $tenant $master_pod -- /bin/bash /load_test/load_test -n -p /load_test/full-logs.properties -t /$test_name -JBASE_URL=$host -l /tmp/${output} $@ -Dserver.rmi.ssl.disable=true
+kubectl exec -ti -n $tenant $master_pod -- /bin/bash /load_test/load_test -n -p /load_test/full-logs.properties -t /$test_name -GBASE_URL=$host -l /tmp/${output} $@ -Dserver.rmi.ssl.disable=true
 kubectl cp -n $tenant "$master_pod:/tmp/${output}" ${output}
 echo "Execution output:${output} execute:"
 echo "cat ${output}"
