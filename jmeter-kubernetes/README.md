@@ -46,7 +46,7 @@ Then nginx should be in running state: ```kubectl --namespace default get pods``
 Note. Without perf=true:NoSchedule node taint jmeter could not be started
 Start jmeter tools:
 ```bash
-  ./build_docker_images.sh
+./build_docker_images.sh
 ./cluster_create.sh
 ./dashboard_init.sh
 kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000 &
@@ -63,6 +63,7 @@ kubectl --namespace default delete deployment nginx
 kubectl --namespace default delete service nginx
 kubecl delete namespace <same_that_you_give_to_cluster_create.sh>
 unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH
+minikube delete
 ```
 
 # Based to
