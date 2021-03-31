@@ -71,3 +71,32 @@ https://github.com/kubernauts/jmeter-kubernetes
 https://github.com/kubernauts/jmeter-operator
 https://blog.kubernauts.io/load-testing-as-a-service-with-jmeter-on-kubernetes-fc5288bb0c8b
 
+# LTaaS With SSL Enabled (Not tested yet)
+The major part is to generate the certificate, this needs to be done before building the docker images of the
+master and slave.
+To generate the certificate, download the jmeter archive and execute the script:
+```
+$ kubectl -n jmeter exec -ti jmeter-master-7b4bbb5b7d-tlmm2 bash -- create-rmi-keystore.sh
+What is your first and last name?
+[Unknown]: rmi
+What is the name of your organizational unit?
+[Unknown]: My unit name
+What is the name of your organization?
+[Unknown]: My organisation name
+What is the name of your City or Locality?
+[Unknown]: Your City
+What is the name of your State or Province?
+[Unknown]: Your State
+What is the two-letter country code for this unit?
+[Unknown]: XY
+Is CN=rmi, OU=My unit name, O=My organisation name, L=Your City, ST=Your State, C=XY
+correct?
+[no]: yes
+Copy the generated rmi_keystore.jks to jmeter/bin folder or reference it in property
+'server.rmi.ssl.keystore.file'
+$ kubectl -n jmeter cp jmeter-master-7b4bbb5b7d-tlmm2:rmi_keystore.jks .
+```
+The certificate file rmi_keystore.jks needs to be copied to the folder where the Dockerfile resides.
+```
+COPY rmi_keystore.jks /jmeter/apache-jmeter-$JMETER_VERSION/bin/
+```
