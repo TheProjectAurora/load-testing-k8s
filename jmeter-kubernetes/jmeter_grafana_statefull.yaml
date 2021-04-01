@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: jmeter-grafana
   labels:
@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       app: jmeter-grafana
+  serviceName: jmeter-grafana
   template:
     metadata:
       labels:
@@ -17,7 +18,10 @@ spec:
       containers:
       - name: grafana
         image: grafana/grafana:7.5.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: grafana-jmeter-storage-stagging
+            mountPath: /var/lib/grafana
         ports:
         - containerPort: 3000
           protocol: TCP
@@ -34,7 +38,34 @@ spec:
           # If you're only using the API Server proxy, set this value instead:
           # value: /api/v1/namespaces/kube-system/services/monitoring-grafana/proxy
           value: /
+      initContainers:
+      - name: init-chown-data
+        image: busybox:1.30
+        imagePullPolicy: IfNotPresent
+        command:
+          - chown
+          - -R
+          - 472:472
+          - /var/lib/grafana
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-jmeter-storage-stagging
       tolerations:
       - key: "perf"
         operator: "Exists"
         effect: "NoSchedule"
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      name: grafana-jmeter-storage-stagging
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      volumeMode: Filesystem
+    status:
+      phase: Pending

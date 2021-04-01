@@ -90,7 +90,7 @@ kubectl create -n $tenant -f $working_dir/jmeter_influxdb_statefull.yaml
 
 echo "Creating Grafana Deployment"
 
-kubectl create -n $tenant -f $working_dir/jmeter_grafana_deploy.yaml
+kubectl create -n $tenant -f $working_dir/jmeter_grafana_statefull.yaml
 
 kubectl create -n $tenant -f $working_dir/jmeter_grafana_svc.yaml
 
