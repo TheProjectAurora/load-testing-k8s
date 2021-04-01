@@ -1,5 +1,4 @@
 FROM openjdk:8-jdk-slim
-MAINTAINER Kubernauts-lab
 		
 ARG JMETER_VERSION=5.4.1
 		
@@ -9,7 +8,8 @@ apt-get -qy install \
 wget \
 telnet \
 iputils-ping \
-unzip
+unzip \
+curl
 RUN   mkdir /jmeter \
 && cd /jmeter/ \
 && wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-$JMETER_VERSION.tgz \
