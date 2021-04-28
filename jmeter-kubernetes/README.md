@@ -9,8 +9,6 @@ Minikube
 ```
 minikube start --cpus=4 --memory=4g
 minikube kubectl config view > ~/.kube/config
-
-export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
 ```
 
 ## Taint an label nodes where jmeter should be executed
@@ -24,10 +22,9 @@ kubectl label node <NODE_NAME> perf="true"
 ```
 
 ## Jmeter environment startup:
-Note. Without perf=true:NoSchedule node taint jmeter could not be started
+Note. Without perf="true" node label jmeter could not be started
 Start jmeter tools:
 ```bash
-./build_docker_images.sh
 ./create_cluster_and_monitoring.sh
 ./init_dashboard.sh
 ```
@@ -120,11 +117,14 @@ kubectl delete namespace suteg
 kubectl delete namespace <same_that_you_give_to_cluster_create.sh>
 e.g. kubectl delete namespace jmeter
 ```
-
 Untaint nodes with command:
 ```bash
 kubectl taint node <NODE_NAME> perf=true:NoSchedule-
 kubectl label node <NODE_NAME> perf-
+```
+## SandBox - minikube clean:
+```
+minikube delete
 ```
 
 # noVNC platform as a tool:
@@ -137,13 +137,23 @@ kubectl label node <NODE_NAME> perf-
     
 <br><br>Read these before usage - Known Problems / features: https://github.com/TheProjectAurora/novnc-robotframework-docker#known-problems-existing-features
 ## Usage:
-Before usage be sure that your dockercli is connected to your host: ```unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH```
 1. Execute: ```docker-compose up```
 1. Go to: https://localhost user:coder pw:coderpw
 1. Put it to fullscreen and start to play with it.
 ### Clean:
 1. Execute: ```docker-compose down```
 
+# FYI:
+## Minikube sandbox:
+Connect docker-cli to docker inside of minikube:
+```
+export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
+```
+Connect docker-cli back to host:
+```
+unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH
+```
+...this could be needed then if own jmeter images are want to be builded to minikube by: [./build_docker_images.sh](https://github.com/TheProjectAurora/load-testing-k8s/blob/master/jmeter-kubernetes/build_docker_images.sh)
 
 # Based to
 Please follow the guide "Load Testing Jmeter On Kubernetes" on our medium blog post: <br>
