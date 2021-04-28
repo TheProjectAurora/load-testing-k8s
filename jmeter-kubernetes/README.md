@@ -1,34 +1,38 @@
-# Jmeter Cluster Support for Kubernetes and OpenShift
+# Jmeter Cluster Support for Kubernetes
 
 ## Prerequisits
 Kubernetes > 1.16
 Docker
 Minikube
 
-## SandBox - Start minikube and connect kubectl and docker to it:
-```
-minikube start --cpus=4 --memory=4g
-minikube kubectl config view > ~/.kube/config
-
-export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
-```
-
-## Taint nodes where jmeter should be executed
+## Taint an label nodes where jmeter should be executed
 ### FYI: Taints with multible nodes could be tested with https://kind.sigs.k8s.io/
 Taint the nodes where you wanna jmeter to under execution:
 ```bash
 kubectl get nodes
 kubectl taint node <NODE_NAME> perf=true:NoSchedule
+kubectl label node <NODE_NAME> perf="true"
+
 ```
+
+## Jmeter environment startup:
+Note. Without perf=true:NoSchedule node taint jmeter could not be started
+Start jmeter tools:
+```bash
+./build_docker_images.sh
+./create_cluster_and_monitoring.sh
+./init_dashboard.sh
+```
+
 ## Start SUT (just nginx)
 ```
-kubectl --namespace default create deployment nginx --image=nginx
-kubectl --namespace default create service nodeport nginx --tcp=80:80
-kubectl --namespace default get pods
+kubectl create namespace suteg
+kubectl --namespace suteg create deployment nginx --image=nginx
+kubectl --namespace suteg create service clusterip nginx --tcp=80:80
 ```
-If nginx pod is in Pending state then:
+In single node system nginx SUT could not started and it is on pending state becouse node is tainted. So if nginx pod is in Pending state then add taint to place:
 
-With ```kubectl --namespace default edit deployment nginx``` add toleration in place:
+With ```kubectl --namespace suteg edit deployment nginx``` add toleration in place:
 ```
 ---clip here you see that tolerations chould be in same level than containers---
   containers:
@@ -40,41 +44,100 @@ With ```kubectl --namespace default edit deployment nginx``` add toleration in p
 ---clap---
 
 ```
-Then nginx should be in running state: ```kubectl --namespace default get pods```
+Then nginx should be in running state: ```kubectl --namespace suteg get pods```
 
-## Jmeter environment startup:
-Note. Without perf=true:NoSchedule node taint jmeter could not be started
-Start jmeter tools:
+## START TEST IN K8S:
+start_test.sh made needed preparation to system and in the end start jmeter to backround with nohub to jmeter-master pod. That how execution could be leaved to runing without requirement to keep computer running where start_test.sh script is executed. This also avoid network glitch interupts to execution. Test execution happened inside of test environment. 
+<br>
+Sut address is: http://nginx.suteg:80
+### Execute jmeter in cluster mode: 
+```
+./start_test.sh master test_nginx.jmx http://nginx.suteg:80 jmeter_results.csv
+```
+### Execute jmeter in master mode:
+```
+./start_test.sh cluster test_nginx.jmx  http://nginx.suteg:80 jmeter_results.csv
+```
+
+## MONITOR/RESULTS OF JMETER EXECUTION IN K8S:
+### Check is jmeter execution under execution in jmeter-master pod
+```
+kubectl exec -it -n jmeter $(kubectl get -n jmeter pods | grep -w jmeter-master.*) -- bash -c "ps aux | grep jmeter | grep -v grep"
+```
+### Follow jmeter-master execution in pod
+```
+kubectl exec -it -n jmeter $(kubectl get -n jmeter pods | grep -w jmeter-master.*) -- bash -c "tail -f /tmp/execution.txt"
+```
+## GET RESULTS OF JMETER IN K8S WHEN TESTS ARE EXECUTED:
+```
+./get_results.sh
+```
+
+## JMETER IN OWN DESKTOP (R&D of testcases):
+```
+jmeter -n -t test_nginx.jmx -JBASE_URL=http://nginx.suteg:80 -l jmeter_results.csv
+```
+## Load execution results:
 ```bash
-./build_docker_images.sh
-./cluster_create.sh
+while true; do kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000; done
+```
+- http://localhost:3000/ should answer <br>
+- Import Dashboard from [./dashboard folder](./dashboard folder) <br>
+- Jmeter accurate results are in:
+    - jmeter_results.csv file
+    - html/index.html file
+
+
+# CLEANING OF ENV:
+## If you wanna keep influxdb and grafana persistent data:
+```bash
+./delete_cluster.sh
+./delete_monitoring.sh
+```
+FYI: Redeploy all stuff that not exist:
+```bash
+./create_cluster_and_monitoring.sh
 ./dashboard_init.sh
-kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000 &
 ```
-http://localhost:3000/ should answer
-Import Dashboard: GrafanaJMeterTemplate.json
-```
-./start_test.sh test_nginx.jmx nginx.default jmeter_results.csv
+## IF YOU WANNA CLEAN ALSO InfluxDB ang Grafana peristent data:
+```bash
+kubectl delete namespace suteg
+kubectl delete namespace <same_that_you_give_to_cluster_create.sh>
+e.g. kubectl delete namespace jmeter
 ```
 
-## Delete all:
+Untaint nodes with command:
 ```bash
-kubectl --namespace default delete deployment nginx
-kubectl --namespace default delete service nginx
-kubecl delete namespace <same_that_you_give_to_cluster_create.sh>
-unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH
-minikube delete
+kubectl taint node <NODE_NAME> perf=true:NoSchedule-
+kubectl label node <NODE_NAME> perf-
 ```
+
+# noVNC platform as a tool:
+- include jmeter GUI
+- kubectl work ok if it can get your ~/.kube volume mounted to container
+- include 
+    - python
+    - Microsoft Visual Studio
+    - browsers
+    
+<br><br>Read these before usage - Known Problems / features: https://github.com/TheProjectAurora/novnc-robotframework-docker#known-problems-existing-features
+## Usage:
+1. Execute: ```docker-compose up```
+1. Go to: https://localhost user:coder pw:coderpw
+1. Put it to fullscreen and start to play with it.
+### Clean:
+1. Execute: ```docker-compose down```
+
 
 # Based to
-Please follow the guide "Load Testing Jmeter On Kubernetes" on our medium blog post:
-https://github.com/kubernauts/jmeter-kubernetes
-https://github.com/kubernauts/jmeter-operator
+Please follow the guide "Load Testing Jmeter On Kubernetes" on our medium blog post: <br>
+https://github.com/kubernauts/jmeter-kubernetes <br>
+https://github.com/kubernauts/jmeter-operator <br>
 https://blog.kubernauts.io/load-testing-as-a-service-with-jmeter-on-kubernetes-fc5288bb0c8b
 
 # LTaaS With SSL Enabled (Not tested yet)
 The major part is to generate the certificate, this needs to be done before building the docker images of the
-master and slave.
+master and slave. <br>
 To generate the certificate, download the jmeter archive and execute the script:
 ```
 $ kubectl -n jmeter exec -ti jmeter-master-7b4bbb5b7d-tlmm2 bash -- create-rmi-keystore.sh

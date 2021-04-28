@@ -21,6 +21,7 @@ services:
       - '443:443'
     volumes:
       - ./:/home/coder/testcase
+      - ~/.kube:/home/coder/.kube
     environment:
       - SSL_PORT=443
       - USER=coder

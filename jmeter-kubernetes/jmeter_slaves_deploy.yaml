@@ -5,7 +5,7 @@ metadata:
   labels:
     jmeter_mode: slave
 spec:
-  replicas: 2 
+  replicas: 3 
   selector:
     matchLabels:
       jmeter_mode: slave
@@ -17,13 +17,16 @@ spec:
       containers:
       - name: jmslave
         image: jmeter_cluster:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
+        env:
+        - name: _JAVA_OPTIONS
+          value: -Djava.net.preferIPv4Stack=true 
         ports:
         - containerPort: 1099
         - containerPort: 50000
         command: ["/bin/sh"]
         args: ["-c", "jmeter-server -Dserver.rmi.localport=50000 -Dserver_port=1099 -Jserver.rmi.ssl.disable=true"]
+      nodeSelector:
+        perf: "true"
       tolerations:
-      - key: "perf"
-        operator: "Exists"
-        effect: "NoSchedule"
+      - operator: Exists     

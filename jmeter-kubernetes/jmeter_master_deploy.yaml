@@ -17,9 +17,12 @@ spec:
       containers:
       - name: jmmaster
         image: jmeter_cluster:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command: [ "/bin/bash", "-c", "--" ]
         args: [ "while true; do sleep 30; done;" ]
+        env:
+        - name: _JAVA_OPTIONS
+          value: -Djava.net.preferIPv4Stack=true 
         volumeMounts:
           - name: loadtest
             mountPath: /load_test
@@ -29,7 +32,7 @@ spec:
       - name: loadtest 
         configMap:
          name: jmeter-load-test
+      nodeSelector:
+        perf: "true"
       tolerations:
-      - key: "perf"
-        operator: "Exists"
-        effect: "NoSchedule"
+      - operator: Exists     

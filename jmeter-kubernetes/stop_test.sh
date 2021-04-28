@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #Script writtent to stop a running jmeter master test
 #Kindly ensure you have the necessary kubeconfig
-set -ex 
+set -x
 working_dir=`pwd`
 
 #Get namesapce variable

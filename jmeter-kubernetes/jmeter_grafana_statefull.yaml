@@ -20,7 +20,7 @@ spec:
         image: grafana/grafana:7.5.1
         imagePullPolicy: Always
         volumeMounts:
-          - name: grafana-jmeter-storage-stagging
+          - name: grafana-jmeter-storage-staging
             mountPath: /var/lib/grafana
         ports:
         - containerPort: 3000
@@ -49,23 +49,23 @@ spec:
           - /var/lib/grafana
         volumeMounts:
         - mountPath: /var/lib/grafana
-          name: grafana-jmeter-storage-stagging
+          name: grafana-jmeter-storage-staging
+      nodeSelector:
+        perf: "true"
       tolerations:
-      - key: "perf"
-        operator: "Exists"
-        effect: "NoSchedule"
+      - operator: Exists     
   volumeClaimTemplates:
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
       creationTimestamp: null
-      name: grafana-jmeter-storage-stagging
+      name: grafana-jmeter-storage-staging
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
+          storage: 1Gi
       volumeMode: Filesystem
     status:
       phase: Pending

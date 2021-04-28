@@ -11,7 +11,17 @@ data:
     #Script should be run like: ./load_test "path to the test script in jmx format"
     set -ex
     rm -Rfv /tmp/*
-    /jmeter/apache-jmeter-*/bin/jmeter $@ -R `getent ahostsv4 jmeter-slaves-svc | cut -d' ' -f1 | sort -u | awk -v ORS=, '{print $1}' | sed 's/,$//'`
+    mode=$1
+    shift
+    echo STARTTIME=$(date +%Y%m%dT%H%M%S) > /tmp/execution.txt
+    cd /tmp
+    if [ "$mode" == "cluster" ]
+    then
+      nohup $(ls /jmeter/apache-jmeter-*/bin/jmeter) $@ -Dserver.rmi.ssl.disable=true -R `getent ahostsv4 jmeter-slaves-svc | cut -d' ' -f1 | sort -u | awk -v ORS=, '{print $1}' | sed 's/,$//'` >> /tmp/execution.txt 2>&1 &
+    elif [ "$mode" == "master" ]
+    then
+      nohup $(ls /jmeter/apache-jmeter-*/bin/jmeter) $@ >> /tmp/execution.txt 2>&1 &
+    fi
   full-logs.properties: |
     #---------------------------------------------------------------------------
     # Results file configuration

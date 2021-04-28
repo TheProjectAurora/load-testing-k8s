@@ -17,12 +17,12 @@ spec:
     spec:
       containers:
         - image: influxdb:1.8
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: influxdb
           volumeMounts:
           - name: config-volume
             mountPath: /etc/influxdb
-          - name: influxdb-jmeter-storage-stagging
+          - name: influxdb-jmeter-storage-staging
             mountPath: /var/lib/influxdb
           ports:
             - containerPort: 8083
@@ -35,22 +35,22 @@ spec:
       - name: config-volume
         configMap:
          name: influxdb-config
+      nodeSelector:
+        perf: "true"
       tolerations:
-      - key: "perf"
-        operator: "Exists"
-        effect: "NoSchedule"
+      - operator: Exists     
   volumeClaimTemplates:
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
       creationTimestamp: null
-      name: influxdb-jmeter-storage-stagging
+      name: influxdb-jmeter-storage-staging
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
+          storage: 1Gi
       volumeMode: Filesystem
     status:
       phase: Pending
