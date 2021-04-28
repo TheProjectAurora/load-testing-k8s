@@ -3,27 +3,27 @@
 ## Prerequisits
 Kubernetes > 1.16
 Docker
-Minikube
+https://kind.sigs.k8s.io/
 
-## SandBox - Start minikube and connect kubectl and docker to it:
+## SandBox - Start kind cluster and connect kubectl to it:
 ```
-minikube start --cpus=4 --memory=4g
-minikube kubectl config view > ~/.kube/config
+kind create cluster --config kind_cluster.yaml
 ```
 
 ## Taint an label nodes where jmeter should be executed
-### FYI: Taints with multible nodes could be tested with https://kind.sigs.k8s.io/
 Taint the nodes where you wanna jmeter to under execution:
 ```bash
 kubectl get nodes
-kubectl taint node <NODE_NAME> perf=true:NoSchedule
-kubectl label node <NODE_NAME> perf="true"
+kubectl taint node kind-worker2 perf=true:NoSchedule
+kubectl taint node kind-worker3 perf=true:NoSchedule
+kubectl label node kind-worker2 perf="true"
+kubectl label node kind-worker3 perf="true"
+
 
 ```
 
 ## Jmeter environment startup:
-Note. Without perf="true" node label jmeter could not be started
-Start jmeter tools:
+Start jmeter tools (recommend to use jmeter namespace):
 ```bash
 ./create_cluster_and_monitoring.sh
 ./init_dashboard.sh
@@ -35,33 +35,19 @@ kubectl create namespace suteg
 kubectl --namespace suteg create deployment nginx --image=nginx
 kubectl --namespace suteg create service clusterip nginx --tcp=80:80
 ```
-In single node system nginx SUT could not started and it is on pending state becouse node is tainted. So if nginx pod is in Pending state then add taint to place:
-
-With ```kubectl --namespace suteg edit deployment nginx``` add toleration in place:
-```
----clip here you see that tolerations chould be in same level than containers---
-  containers:
----clip---
-  tolerations:
-  - effect: NoSchedule
-    key: perf
-    operator: Exists
----clap---
-
-```
 Then nginx should be in running state: ```kubectl --namespace suteg get pods```
 
 ## START TEST IN K8S:
 start_test.sh made needed preparation to system and in the end start jmeter to backround with nohub to jmeter-master pod. That how execution could be leaved to runing without requirement to keep computer running where start_test.sh script is executed. This also avoid network glitch interupts to execution. Test execution happened inside of test environment. 
 <br>
 Sut address is: http://nginx.suteg:80
-### Execute jmeter in master mode: 
-```
-./start_test.sh master test_nginx.jmx http://nginx.suteg:80 jmeter_results.csv
-```
 ### Execute jmeter in cluster mode:
 ```
 ./start_test.sh cluster test_nginx.jmx  http://nginx.suteg:80 jmeter_results.csv
+```
+### Execute jmeter in master mode: 
+```
+./start_test.sh master test_nginx.jmx http://nginx.suteg:80 jmeter_results.csv
 ```
 
 ## MONITOR/RESULTS OF JMETER EXECUTION IN K8S:
@@ -122,9 +108,9 @@ Untaint nodes with command:
 kubectl taint node <NODE_NAME> perf=true:NoSchedule-
 kubectl label node <NODE_NAME> perf-
 ```
-## SandBox - minikube clean:
+## SandBox - kind cluster clean:
 ```
-minikube delete
+kind delete cluster
 ```
 
 # noVNC platform as a tool:
@@ -142,18 +128,6 @@ minikube delete
 1. Put it to fullscreen and start to play with it.
 ### Clean:
 1. Execute: ```docker-compose down```
-
-# FYI:
-## Minikube sandbox:
-Connect docker-cli to docker inside of minikube:
-```
-export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
-```
-Connect docker-cli back to host:
-```
-unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH
-```
-...this could be needed then if own jmeter images are want to be builded to minikube by: [./build_docker_images.sh](https://github.com/TheProjectAurora/load-testing-k8s/blob/master/jmeter-kubernetes/build_docker_images.sh)
 
 # Based to
 Please follow the guide "Load Testing Jmeter On Kubernetes" on our medium blog post: <br>
