@@ -30,5 +30,5 @@ services:
       #- RESOLUTION=1920x1080
       #- X11VNC_ARGS=-multiptr
 
-  nginx.default:
+  nginx.suteg:
     image: nginx

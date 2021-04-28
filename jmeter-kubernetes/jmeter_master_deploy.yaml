@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: jmmaster
-        image: jmeter_cluster:latest
-        imagePullPolicy: Always
+        image: theprojectaurora/jmeter_cluster:latest
+        imagePullPolicy: Always 
         command: [ "/bin/bash", "-c", "--" ]
         args: [ "while true; do sleep 30; done;" ]
         env:

@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: jmslave
-        image: jmeter_cluster:latest
-        imagePullPolicy: Always
+        image: theprojectaurora/jmeter_cluster:latest
+        imagePullPolicy: Always 
         env:
         - name: _JAVA_OPTIONS
           value: -Djava.net.preferIPv4Stack=true 

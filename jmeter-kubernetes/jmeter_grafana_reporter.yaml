@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: jmreporter
-        image: jmeter_reporter:latest
+        image: theprojectaurora/jmeter_reporter:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8686

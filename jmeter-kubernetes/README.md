@@ -5,6 +5,14 @@ Kubernetes > 1.16
 Docker
 Minikube
 
+## SandBox - Start minikube and connect kubectl and docker to it:
+```
+minikube start --cpus=4 --memory=4g
+minikube kubectl config view > ~/.kube/config
+
+export DOCKER_TLS_VERIFY=1 DOCKER_HOST=tcp://$(docker container port minikube 2376) export DOCKER_CERT_PATH=/mnt/c/Users/sakar/.minikube/certs;
+```
+
 ## Taint an label nodes where jmeter should be executed
 ### FYI: Taints with multible nodes could be tested with https://kind.sigs.k8s.io/
 Taint the nodes where you wanna jmeter to under execution:
@@ -50,11 +58,11 @@ Then nginx should be in running state: ```kubectl --namespace suteg get pods```
 start_test.sh made needed preparation to system and in the end start jmeter to backround with nohub to jmeter-master pod. That how execution could be leaved to runing without requirement to keep computer running where start_test.sh script is executed. This also avoid network glitch interupts to execution. Test execution happened inside of test environment. 
 <br>
 Sut address is: http://nginx.suteg:80
-### Execute jmeter in cluster mode: 
+### Execute jmeter in master mode: 
 ```
 ./start_test.sh master test_nginx.jmx http://nginx.suteg:80 jmeter_results.csv
 ```
-### Execute jmeter in master mode:
+### Execute jmeter in cluster mode:
 ```
 ./start_test.sh cluster test_nginx.jmx  http://nginx.suteg:80 jmeter_results.csv
 ```
@@ -72,12 +80,7 @@ kubectl exec -it -n jmeter $(kubectl get -n jmeter pods | grep -w jmeter-master.
 ```
 ./get_results.sh
 ```
-
-## JMETER IN OWN DESKTOP (R&D of testcases):
-```
-jmeter -n -t test_nginx.jmx -JBASE_URL=http://nginx.suteg:80 -l jmeter_results.csv
-```
-## Load execution results:
+### Load execution results in influxdb with grafana:
 ```bash
 while true; do kubectl --namespace jmeter port-forward service/jmeter-grafana 3000:3000; done
 ```
@@ -87,6 +90,18 @@ while true; do kubectl --namespace jmeter port-forward service/jmeter-grafana 30
     - jmeter_results.csv file
     - html/index.html file
 
+
+
+## JMETER IN OWN DESKTOP (R&D of testcases):
+### With working version of /.kube/config mount to noVNC:
+```
+while true; do kubectl --namespace suteg port-forward service/nginx 80:80; done
+jmeter -n -t test_nginx.jmx -JBASE_URL=http://localhost:80 -l jmeter_results.csv
+```
+### Against nginx.suteg that is kicked up in docker-compose.yaml
+```
+jmeter -n -t test_nginx.jmx -JBASE_URL=http://nginx.sut:80 -l jmeter_results.csv
+```
 
 # CLEANING OF ENV:
 ## If you wanna keep influxdb and grafana persistent data:
@@ -122,6 +137,7 @@ kubectl label node <NODE_NAME> perf-
     
 <br><br>Read these before usage - Known Problems / features: https://github.com/TheProjectAurora/novnc-robotframework-docker#known-problems-existing-features
 ## Usage:
+Before usage be sure that your dockercli is connected to your host: ```unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH```
 1. Execute: ```docker-compose up```
 1. Go to: https://localhost user:coder pw:coderpw
 1. Put it to fullscreen and start to play with it.
