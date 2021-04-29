@@ -1,9 +1,10 @@
 # Jmeter Cluster Support for Kubernetes
 
 ## Prerequisits
-Kubernetes > 1.16
-Docker
-https://kind.sigs.k8s.io/
+6G Memory
+<br>Kubernetes > 1.16
+<br>Docker
+<br>Kind - https://kind.sigs.k8s.io/
 
 ## SandBox - Start kind cluster and connect kubectl to it:
 ```
@@ -11,23 +12,18 @@ kind create cluster --config kind_cluster.yaml
 ```
 
 ## Taint an label nodes where jmeter should be executed
-Taint the nodes where you wanna jmeter to under execution:
+Taint the node(s) where you wanna jmeter to under execution:
 ```bash
 kubectl get nodes
 kubectl taint node kind-worker2 perf=true:NoSchedule
-kubectl taint node kind-worker3 perf=true:NoSchedule
 kubectl label node kind-worker2 perf="true"
-kubectl label node kind-worker3 perf="true"
-
-
 ```
 
 ## Jmeter environment startup:
 Start jmeter tools (recommend to use jmeter namespace):
-```bash
-./create_cluster_and_monitoring.sh
-./init_dashboard.sh
-```
+1. Create jmeter clustes: ```./create_cluster_and_monitoring.sh```
+1. Then pods should be in running state: ```kubectl get pods -n jmeter```
+1. Initialize influxdb and add it datasource to grafana: ```./init_dashboard.sh```
 
 ## Start SUT (just nginx)
 ```

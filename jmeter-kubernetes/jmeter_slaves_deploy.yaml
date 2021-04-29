@@ -5,7 +5,7 @@ metadata:
   labels:
     jmeter_mode: slave
 spec:
-  replicas: 3 
+  replicas: 2
   selector:
     matchLabels:
       jmeter_mode: slave
@@ -17,6 +17,11 @@ spec:
       containers:
       - name: jmslave
         image: theprojectaurora/jmeter_cluster:latest
+        resources:
+          limits:
+            memory: "500Mi"
+          requests:
+            memory: "100Mi"
         imagePullPolicy: Always 
         env:
         - name: _JAVA_OPTIONS

@@ -18,6 +18,11 @@ spec:
       containers:
       - name: grafana
         image: grafana/grafana:7.5.1
+        resources:
+          limits:
+            memory: "1Gi"
+          requests:
+            memory: "100M"
         imagePullPolicy: Always
         volumeMounts:
           - name: grafana-jmeter-storage-staging

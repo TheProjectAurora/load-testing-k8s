@@ -16,6 +16,11 @@ spec:
     spec:
       containers:
       - name: jmmaster
+        resources:
+          limits:
+            memory: "500Mi"
+          requests:
+            memory: "100Mi"
         image: theprojectaurora/jmeter_cluster:latest
         imagePullPolicy: Always 
         command: [ "/bin/bash", "-c", "--" ]
