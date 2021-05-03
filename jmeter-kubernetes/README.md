@@ -65,6 +65,8 @@ while true; do kubectl --namespace jmeter port-forward service/jmeter-grafana 30
 ```
 - http://localhost:3000/ should answer <br>
 - Import Dashboard from [./dashboard folder](./dashboard folder) <br>
+  - By default JustJmeterGraph.json work smoothly
+  - If you install https://k8slens.dev/ connect it to cluster and under cluster setting install "Metrics Stack" you can use Jmeter+LensK8sPrometheus-metrics.json 
 - Jmeter accurate results are in:
     - jmeter_results.csv file
     - html/index.html file
