@@ -39,11 +39,11 @@ start_test.sh made needed preparation to system and in the end start jmeter to b
 Sut address is: http://nginx.suteg:80
 ### Execute jmeter in cluster mode:
 ```
-./start_test.sh cluster test_nginx.jmx  http://nginx.suteg:80 jmeter_results.csv
+./start_test.sh cluster test_nginx.jmx http://nginx.suteg:80 jmeter_results.csv -GTHREADS=20 -GRAMP_UP_MIN=2 -GHOLD_TARGET_MIN=0 -GDEVIATION=50 -GCONSTANT_DELAY=100 -GSETUP_THREADS=10 -GSETUP_RAMP_UP_SEC=60
 ```
 ### Execute jmeter in master mode: 
 ```
-./start_test.sh master test_nginx.jmx http://nginx.suteg:80 jmeter_results.csv
+./start_test.sh master test_nginx.jmx http://nginx.suteg:80 jmeter_results.csv -JTHREADS=20 -JRAMP_UP_MIN=2 -JHOLD_TARGET_MIN=0 -JDEVIATION=50 -JCONSTANT_DELAY=100 -JSETUP_THREADS=10 -JSETUP_RAMP_UP_SEC=60
 ```
 
 ## MONITOR/RESULTS OF JMETER EXECUTION IN K8S:
@@ -75,11 +75,11 @@ while true; do kubectl --namespace jmeter port-forward service/jmeter-grafana 30
 ### With working version of /.kube/config mount to noVNC:
 ```
 while true; do kubectl --namespace suteg port-forward service/nginx 80:80; done
-jmeter -n -t test_nginx.jmx -JBASE_URL=http://localhost:80 -l jmeter_results.csv
+jmeter -n -t test_nginx.jmx -JBASE_URL=http://localhost:80 -l jmeter_results.csv -JTHREADS=10 -JRAMP_UP_MIN=1 -JHOLD_TARGET_MIN=0 -JDEVIATION=50 -JCONSTANT_DELAY=100 -JSETUP_THREADS=10 -JSETUP_RAMP_UP_SEC=60
 ```
 ### Against nginx.suteg that is kicked up in docker-compose.yaml
 ```
-jmeter -n -t test_nginx.jmx -JBASE_URL=http://nginx.sut:80 -l jmeter_results.csv
+jmeter -n -t test_nginx.jmx -JBASE_URL=http://nginx.sut:80 -l jmeter_results.csv -JTHREADS=10 -JRAMP_UP_MIN=1 -JHOLD_TARGET_MIN=0 -JDEVIATION=50 -JCONSTANT_DELAY=100 -JSETUP_THREADS=10 -JSETUP_RAMP_UP_SEC=60
 ```
 
 # CLEANING OF ENV:
@@ -91,7 +91,7 @@ jmeter -n -t test_nginx.jmx -JBASE_URL=http://nginx.sut:80 -l jmeter_results.csv
 FYI: Redeploy all stuff that not exist:
 ```bash
 ./create_cluster_and_monitoring.sh
-./dashboard_init.sh
+./init_dashboard.sh
 ```
 ## IF YOU WANNA CLEAN ALSO InfluxDB ang Grafana peristent data:
 ```bash

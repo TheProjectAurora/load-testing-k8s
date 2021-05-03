@@ -2,3 +2,4 @@ tenant_export
 results-*
 jmeter.log
 jmeter_results.csv
+.vscode
