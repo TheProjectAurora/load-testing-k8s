@@ -19,13 +19,11 @@ spec:
         image: theprojectaurora/jmeter_cluster:latest
         resources:
           limits:
-            memory: "500Mi"
-          requests:
-            memory: "100Mi"
+            memory: "1024Mi"
         imagePullPolicy: Always 
         env:
         - name: _JAVA_OPTIONS
-          value: -Djava.net.preferIPv4Stack=true 
+          value: -Djava.net.preferIPv4Stack=true -Xmx512M -Xms256M
         ports:
         - containerPort: 1099
         - containerPort: 50000

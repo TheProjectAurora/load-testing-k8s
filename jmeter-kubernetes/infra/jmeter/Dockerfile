@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-slim
+FROM openjdk:11-jdk-slim-bullseye
 		
 ARG JMETER_VERSION=5.4.1
 		
