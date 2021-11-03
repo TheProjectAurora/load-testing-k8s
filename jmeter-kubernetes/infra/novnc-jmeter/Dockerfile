@@ -48,7 +48,7 @@ RUN curl -sSL https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl >
     chmod +x /usr/local/bin/kubectl
 
 # Install kubectl krew: https://krew.sigs.k8s.io/
-RUN curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
+RUN curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/v0.4.1/krew.tar.gz" && \
     tar zxvf krew.tar.gz && \
     ./krew-linux_amd64 install krew && \
     rm -Rf krew*
